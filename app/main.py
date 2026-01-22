@@ -1,11 +1,11 @@
 from fastapi import FastAPI
-from backend.app.routers import subjectRouter
 from app.database import engine, Base
+from app.routers import SubjectRouter
 
 Base.metadata.create_all(bind=engine)
 
 app = FastAPI()
-app.include_router(subjectRouter.router)
+app.include_router(SubjectRouter.router)
 
 @app.get("/")
 async def read_root():
