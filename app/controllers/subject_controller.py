@@ -1,6 +1,6 @@
 from sqlalchemy.orm import Session
 from ..models.Subject import Subject
-from ..schema import SubjectSchema as schemas
+from app.schema import subject_schema as schemas
 
 
 def create_subject(db: Session, subject: schemas.SubjectCreate):
