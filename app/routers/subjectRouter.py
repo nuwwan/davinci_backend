@@ -1,14 +1,14 @@
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 
-from ..controllers import SubjectController
-from ..database import get_db
-from ..schema import SubjectSchema as schema
+from app.controllers import SubjectController
+from app.database import get_db
+from app.schema import subjectSchema as schema
 
 router = APIRouter(prefix="/subjects", tags=["Subjects"])
 
 
-@router.post("/", response_model=schema.SubjectResponse)
+@router.post("/", response_model=schema.SubjectResponse, status_code=201)
 def create_subject(
     subject: schema.SubjectCreate, db: Session = Depends(get_db)
 ):
