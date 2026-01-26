@@ -5,6 +5,7 @@ from sqlalchemy.sql import func
 from ..database import Base
 import enum
 
+
 class UserRole(str, enum.Enum):
     ADMIN = "ADMIN"
     AUTHOR = "AUTHOR"
