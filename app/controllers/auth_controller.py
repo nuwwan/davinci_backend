@@ -10,13 +10,14 @@ from app.core.security import (
 )
 from datetime import datetime, timedelta
 from app.core.config import SECRET_KEY, ALGORITHM
-from jose import jwt, JWTError
 from app.utils.email_service import send_email
 from app.core.logger import logger
+from app.utils.auth_service import generate_email_verification_token, verify_email_verification_token
+from jose import JWTError
 
 
 # Signup user
-def create_auth_controller(user: UserCreate, db: Session):
+def create_user(user: UserCreate, db: Session):
     logger.debug(f"Creating user account for email: {user.email}")
     
     if not user:
@@ -140,35 +141,13 @@ def refresh_access_token(refresh_token: str, db: Session):
         )
 
 
-# Signout user
-def signout_user(user_id: int, db: Session):
-    logger.debug(f"User signout requested: {user_id}")
-    
-    user = db.query(User).filter_by(id=user_id).first()
-    if not user:
-        logger.warning(f"Signout attempt for non-existent user: {user_id}")
-        raise HTTPException(status_code=404, detail="User not found")
-    
-    logger.info(f"User signed out successfully: {user_id}")
-    # Here you would typically handle token invalidation (e.g., blacklisting)
-    return {"message": "User signed out successfully"}
-
-
 # Activate user email
 def activate_user_email(token: str, db: Session):
     """Activate user email by verifying the email verification token"""
     logger.debug("Attempting to activate user email with token")
     
     try:
-        # Decode and validate the token
-        payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
-
-        # Verify token type
-        if payload.get("type") != "email_verification":
-            logger.warning("Invalid token type for email verification")
-            raise HTTPException(status_code=400, detail="Invalid token type")
-
-        user_id = payload.get("sub")
+        user_id = verify_email_verification_token(token)
         if not user_id:
             logger.warning("Email verification token missing user ID")
             raise HTTPException(status_code=400, detail="Invalid token")
@@ -275,19 +254,3 @@ def send_user_verification_email(to_email: str, user_id: str):
     send_email(to_email, subject, body)
     logger.info(f"Verification email sent successfully to: {to_email}")
 
-
-# Generate email verification token
-def generate_email_verification_token(user_id: int):
-    """Generate a token for email verification (valid for 24 hours)"""
-    logger.debug(f"Generating email verification token for user: {user_id}")
-    
-    now = datetime.utcnow()
-    data = {
-        "sub": str(user_id),
-        "iat": now,
-        "exp": now + timedelta(hours=24),
-        "type": "email_verification",
-    }
-    token = jwt.encode(data, SECRET_KEY, algorithm=ALGORITHM)
-    logger.debug(f"Email verification token generated successfully")
-    return token

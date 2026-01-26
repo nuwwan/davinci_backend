@@ -3,7 +3,7 @@ from fastapi import APIRouter, Depends
 from sqlalchemy.orm import Session
 from app.database import get_db
 from app.controllers.auth_controller import (
-    create_auth_controller,
+    create_user,
     authenticate_user,
     activate_user_email,
     verify_user_email_request,
@@ -17,7 +17,7 @@ router = APIRouter(prefix="/auth", tags=["Authentication"])
 def register_user(user: UserCreate, db: Session = Depends(get_db)):
     logger.info(f"User registration attempt: {user.email}")
     try:
-        result = create_auth_controller(user, db)
+        result = create_user(user, db)
         logger.info(f"User registered successfully: {user.email}")
         return result
     except Exception as e:
