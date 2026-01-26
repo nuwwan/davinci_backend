@@ -1,5 +1,5 @@
 from sqlalchemy.orm import Session
-from ..models.Subject import Subject
+from app.models.subject import Subject
 from app.schema import subject_schema as schemas
 
 
