@@ -33,10 +33,8 @@ def create_auth_controller(user: UserCreate, db: Session):
     db.commit()
     db.refresh(user_obj)
 
-    # Generate email verification token
-    verification_token = generate_email_verification_token(user_obj.id)
-
     # Send Email for verification
+    send_user_verification_email(user_obj.email, str(user_obj.id))
 
     return {
         "user_id": user_obj.id,
@@ -218,7 +216,8 @@ def send_user_verification_email(to_email: str, user_id: str):
     )
 
     subject = "Verify your email"
-    body = f"Please verify your email by clicking on the following link: {verification_link}"
+    body = f'''Please verify your email by clicking on the following
+      link: {verification_link}'''
     # Call the email service to send the email
     send_email(to_email, subject, body)
 
