@@ -8,7 +8,5 @@ def send_email(to_email: str, subject: str, body: str):
         # using an email service provider
         pass
     # Placeholder function to simulate sending an email
-    print(
-        f'''Sending email to {to_email} with subject
-         '{subject}' and body:\n{body}'''
-    )
+    print(f"""Sending email to {to_email} with subject
+         '{subject}' and body:\n{body}""")

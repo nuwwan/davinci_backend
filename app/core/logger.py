@@ -1,7 +1,6 @@
 import sys
 import os
 from loguru import logger
-from datetime import datetime
 
 # Remove default handler
 logger.remove()
@@ -17,7 +16,12 @@ log_level = os.getenv("LOG_LEVEL", "INFO")
 logger.add(
     sys.stdout,
     level=log_level,
-    format="<green>{time:YYYY-MM-DD HH:mm:ss}</green> | <level>{level: <8}</level> | <cyan>{name}</cyan>:<cyan>{function}</cyan>:<cyan>{line}</cyan> - <level>{message}</level>",
+    format='''
+    <green>{time:YYYY-MM-DD HH:mm:ss}</green>
+      | <level>{level: <8}</level>
+        | <cyan>{name}</cyan>:<cyan>{function}</cyan>
+        :<cyan>{line}</cyan> - <level>{message}</level>
+        ''',
     colorize=True,
 )
 
@@ -25,7 +29,10 @@ logger.add(
 logger.add(
     os.path.join(log_dir, "app.log"),
     level="DEBUG",
-    format="{time:YYYY-MM-DD HH:mm:ss} | {level: <8} | {name}:{function}:{line} - {message}",
+    format=(
+        "{time:YYYY-MM-DD HH:mm:ss} | {level: <8} | "
+        "{name}:{function}:{line} - {message}"
+    ),
     rotation="500 MB",
     retention="10 days",
     compression="zip",
@@ -35,7 +42,10 @@ logger.add(
 logger.add(
     os.path.join(log_dir, "error.log"),
     level="ERROR",
-    format="{time:YYYY-MM-DD HH:mm:ss} | {level: <8} | {name}:{function}:{line} - {message}",
+    format=(
+        "{time:YYYY-MM-DD HH:mm:ss} | {level: <8} | "
+        "{name}:{function}:{line} - {message}"
+    ),
     rotation="500 MB",
     retention="30 days",
 )

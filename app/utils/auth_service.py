@@ -3,11 +3,12 @@ from datetime import datetime, timedelta
 from app.core.config import SECRET_KEY, ALGORITHM
 from app.core.logger import logger
 
+
 # Generate email verification token
 def generate_email_verification_token(user_id: int):
     """Generate a token for email verification (valid for 24 hours)"""
     logger.debug(f"Generating email verification token for user: {user_id}")
-    
+
     now = datetime.utcnow()
     data = {
         "sub": str(user_id),
@@ -16,13 +17,14 @@ def generate_email_verification_token(user_id: int):
         "type": "email_verification",
     }
     token = jwt.encode(data, SECRET_KEY, algorithm=ALGORITHM)
-    logger.debug(f"Email verification token generated successfully")
+    logger.debug("Email verification token generated successfully")
     return token
+
 
 def verify_email_verification_token(token: str):
     """Verify the email verification token and return the user ID"""
     logger.debug("Verifying email verification token")
-    
+
     try:
         payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
         if payload.get("type") != "email_verification":

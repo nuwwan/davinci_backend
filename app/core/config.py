@@ -1,8 +1,9 @@
 import os
-from typing import Optional
 
 # Environment Configuration
-ENVIRONMENT = os.getenv("ENVIRONMENT", "development").lower()  # development, staging, production
+ENVIRONMENT = os.getenv(
+    "ENVIRONMENT", "development"
+).lower()  # development, staging, production
 DEBUG = ENVIRONMENT != "production"
 
 # Security Configuration
@@ -20,7 +21,8 @@ DEVELOPMENT (default):
 
 STAGING:
     export ENVIRONMENT=staging
-    Uses PostgreSQL: postgresql://qna_user:qna_pass@localhost:5432/qna_db_staging
+    Uses PostgreSQL:
+        postgresql://qna_user:qna_pass@localhost:5432/qna_db_staging
     Or override: export DATABASE_URL=postgresql://user:pass@host:port/db
 
 PRODUCTION (AWS RDS):
@@ -30,14 +32,15 @@ PRODUCTION (AWS RDS):
     export DB_USER=dbadmin
     export DB_PASSWORD=secure_password
     export DB_NAME=production_db
-    
     This creates: postgresql://dbadmin:password@endpoint:5432/production_db
     With connection pooling optimized for AWS RDS.
 """
+
+
 def get_database_url() -> str:
     """
     Get database URL based on environment.
-    
+
     For Production:
         AWS RDS PostgreSQL via environment variables:
         - DB_HOST: RDS endpoint
@@ -45,16 +48,16 @@ def get_database_url() -> str:
         - DB_USER: Database username
         - DB_PASSWORD: Database password
         - DB_NAME: Database name
-    
+
     For Development/Staging:
         - DATABASE_URL: Full database URL (overrides other settings)
         - Falls back to SQLite if no URL provided
     """
-    
+
     # If DATABASE_URL is explicitly set, use it (for development/testing)
     if os.getenv("DATABASE_URL"):
         return os.getenv("DATABASE_URL")
-    
+
     # Production: AWS RDS PostgreSQL
     if ENVIRONMENT == "production":
         db_host = os.getenv("DB_HOST")
@@ -62,24 +65,29 @@ def get_database_url() -> str:
         db_user = os.getenv("DB_USER")
         db_password = os.getenv("DB_PASSWORD")
         db_name = os.getenv("DB_NAME")
-        
+
         if not all([db_host, db_user, db_password, db_name]):
             raise ValueError(
-                "Production environment requires DB_HOST, DB_USER, DB_PASSWORD, and DB_NAME"
+                "Production environment requires DB_HOST, DB_USER, "
+                "DB_PASSWORD, and DB_NAME"
             )
-        
+
         # AWS RDS PostgreSQL connection string
-        database_url = f"postgresql://{db_user}:{db_password}@{db_host}:{db_port}/{db_name}"
+        database_url = (
+            f"postgresql://{db_user}:{db_password}@{db_host}:"
+            f"{db_port}/{db_name}"
+        )
         return database_url
-    
+
     # Development/Staging: Local PostgreSQL or SQLite
     if ENVIRONMENT == "staging":
-        # Staging can use a local PostgreSQL or the one provided in DATABASE_URL
+        # Staging can use a local PostgreSQL or override with DATABASE_URL
         return os.getenv(
             "DATABASE_URL",
-            "postgresql://qna_user:qna_pass@localhost:5432/qna_db_staging"
+            "postgresql://qna_user:qna_pass@localhost:5432/"
+            "qna_db_staging",
         )
-    
+
     # Default: Local SQLite for development
     return "sqlite:///./app.db"
 
